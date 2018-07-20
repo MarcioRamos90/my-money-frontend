@@ -1,0 +1,9 @@
+.main-footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+.main-footer i {
+  margin-left: 10px;
+}
