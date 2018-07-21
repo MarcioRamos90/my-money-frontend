@@ -4,7 +4,7 @@ import { reset as resetForm, initialize } from "redux-form";
 import { showTabs, selectTab } from "../common/tab/tabActions";
 
 const BASE_URL = "http://localhost:3003";
-
+const INITIAL_VALUES = {};
 export function getList() {
   const request = axios.get(`${BASE_URL}/api/billingCycles`);
   return {
@@ -14,17 +14,20 @@ export function getList() {
 }
 
 export function create(values) {
+  return submit(values, "post");
+}
+
+export function update(values) {
+  return submit(values, "put");
+}
+
+function submit(values, method) {
   return dispach => {
-    axios
-      .post(`${BASE_URL}/api/billingCycles`, values)
+    const id = values._id ? values._id : "";
+    axios[method](`${BASE_URL}/api/billingCycles/${id}`, values)
       .then(resp => {
         toastr.success("Sucesso", "Operação realizada com sucesso.");
-        dispach([
-          resetForm("billingCycleForm"),
-          getList(),
-          selectTab("tabList"),
-          showTabs("tabList", "tabCreate")
-        ]);
+        dispach(init());
       })
       .catch(e => {
         e.response.data.errors.forEach(error => toastr.error("Erro", error));
@@ -37,5 +40,14 @@ export function showUpdate(billingCycles) {
     showTabs("tabUpdate"),
     selectTab("tabUpdate"),
     initialize("billingCycleForm", billingCycles)
+  ];
+}
+
+export function init() {
+  return [
+    showTabs("tabList", "tabCreate"),
+    selectTab("tabList"),
+    getList(),
+    initialize("billingCycleForm", INITIAL_VALUES)
   ];
 }
